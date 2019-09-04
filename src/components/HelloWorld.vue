@@ -1,58 +1,128 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <v-container style="max-width:600px">
+    <v-layout
+      text-center
+      wrap
+    >
+    <v-col cols="12" sm="12">
+      <h1>Joker Sonrası Hesaplama Aracı</h1>
+    </v-col>
+    <v-col cols="12" sm="12">
+      <p>Kişilerin joker öncesi tutarlarını giriniz:</p>
+    </v-col>
+    <v-row
+      align="center"
+      class="grey lighten-5"
+      cols="12" sm="12"
+      v-for="(name,index) in names"
+    >
+      <v-col cols="6" sm="6">
+        <v-text-field
+        v-model="before[index]"
+        :label="name+' aldıkları toplam'"
+        outlined
+        :hide-details="true"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="6" sm="6">
+        <p>Ödenecek: {{ calculate(index) }}</p>
+      </v-col>
+    </v-row>
+    <hr style="width:120%">
+
+
+    <v-row
+      align="center"
+      class="grey lighten-5"
+    >
+      <v-col cols="6" sm="6">
+        <p :style="'color:'+ beforeSumColor">Toplam: {{ beforeSum() }}</p>
+      </v-col>
+      <v-col cols="6" sm="6">
+        <p :style="'color:'+ afterSumColor">Toplam: {{ afterSum() }}</p>
+      </v-col>
+    </v-row>
+
+
+
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  data: () => ({
+    beforeTotal: null,
+    afterTotal: null,
+    names: [
+      'İhsan', 'MKV', 'Emir', 'Nadide'
+    ],
+    before: [],
+    after: []
+  }),
+  methods: {
+    calculate(index) {
+      for (let i=0;i<this.before.length;i++){
+        this.after[i] = this.before[i]*this.afterPrice()/this.beforeSum()
+      }
+      if (this.after[index])
+        return this.after[index]
+      else
+        return null
+    },
+    afterSum() {
+      if (this.after.length>0)
+        return this.after.reduce((a,b) => Number(a)+Number(b))
+      else {
+        return 0
+      }
+    },
+    beforeSum() {
+      if (this.before.length>0)
+        return this.before.reduce((a,b) => Number(a)+Number(b))
+      else
+        return 0
+    },
+    afterPrice() {
+      let as = this.beforeSum()
+      if (as >= 120){
+        return as-45
+      }else if (as >= 70){
+        return as-25
+      }else if (as >= 40) {
+        return as-15
+      }else if (as >= 30) {
+        return as-10
+      }else {
+        return as
+      }
+    }
+  },
+  computed: {
+
+    beforeSumColor() {
+      if (this.beforeSum == this.beforeTotal)
+        return "green"
+      else
+        return "red"
+    },
+    afterSumColor() {
+      if (this.afterSum == this.afterTotal)
+        return "green"
+      else
+        return "red"
+    }
   }
-}
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+<style media="screen">
+  hr {
+    transform: translateX(-10%);
+    width: "120%";
+  }
+
+  p {
+    margin: 0 !important;
+  }
 </style>
